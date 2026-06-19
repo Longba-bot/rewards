@@ -21,12 +21,17 @@
     padding: 40px 16px;
   }
 
+  .bg-video {
+    position: fixed; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    filter: brightness(0.3) saturate(1.2);
+  }
+
   .bg {
     position: fixed; inset: 0;
-    background:
-      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(61,26,16,0.25) 0%, transparent 70%),
-      radial-gradient(ellipse 50% 50% at 80% 80%, rgba(42,16,9,0.3) 0%, transparent 70%),
-      #0d0805;
+    background: rgba(13,8,5,0.5);
     z-index: 0;
   }
 
@@ -219,6 +224,29 @@
     animation: fadeUp 0.5s 0.8s both;
   }
 
+  .music-bar {
+    position: fixed; bottom: 24px; right: 24px;
+    background: rgba(18,10,7,0.92);
+    border: 1px solid rgba(61,26,16,0.8);
+    border-radius: 100px;
+    padding: 10px 18px;
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; z-index: 999; user-select: none;
+    backdrop-filter: blur(12px);
+    transition: all 0.2s ease;
+    animation: fadeUp 0.5s 0.9s both;
+  }
+  .music-bar:hover { border-color: #3D1A10; box-shadow: 0 0 16px rgba(61,26,16,0.3); }
+  .music-bars { display: flex; align-items: flex-end; gap: 2px; height: 16px; }
+  .music-bars span { display: block; width: 3px; background: #a05a40; border-radius: 2px; animation: barBounce 0.8s ease-in-out infinite alternate; }
+  .music-bars span:nth-child(1) { height: 8px; }
+  .music-bars span:nth-child(2) { height: 14px; animation-delay: 0.15s; }
+  .music-bars span:nth-child(3) { height: 10px; animation-delay: 0.3s; }
+  .music-bars span:nth-child(4) { height: 16px; animation-delay: 0.1s; }
+  .music-bars.paused span { animation-play-state: paused; }
+  @keyframes barBounce { from { transform: scaleY(0.4); } to { transform: scaleY(1); } }
+  .music-label { font-size: 12px; color: rgba(255,255,255,0.5); font-weight: 500; }
+
   @media (max-width: 640px) {
     body { padding: 20px 12px; align-items: flex-start; }
     .grid, .grid-3 { grid-template-columns: 1fr; }
@@ -231,6 +259,12 @@
 </head>
 <body>
 
+<video class="bg-video" autoplay muted loop playsinline>
+  <source src="https://raw.githubusercontent.com/Longba-bot/rewards/main/Realest%20Cram%20-%20Punta%20Ka_%20feat.%20Ohthreesosa%20(Official%20Visualizer).mp4" type="video/mp4">
+</video>
+<audio id="bgMusic" loop>
+  <source src="https://raw.githubusercontent.com/Longba-bot/rewards/main/Realest%20Cram%20-%20Punta%20Ka_%20feat.%20Ohthreesosa%20(Visualizer).mp3" type="audio/mpeg">
+</audio>
 <div class="bg"></div>
 <div class="scanlines"></div>
 
@@ -238,7 +272,7 @@
 
   <!-- HEADER -->
   <div class="header">
-    <img class="header-logo" src="https://cdn.discordapp.com/emojis/1508147096631513188.webp?size=96" alt="Longba">
+    <img class="header-logo" src="https://raw.githubusercontent.com/Longba-bot/rewards/main/logo.png" alt="Longba">
     <h1>Longba</h1>
     <p>Multi-purpose Discord bot · Economy · Games · Rewards</p>
   </div>
@@ -410,6 +444,44 @@
   </div>
 
 </div>
+
+<!-- Music Toggle -->
+<div class="music-bar" id="musicToggle">
+  <div class="music-bars" id="musicBars">
+    <span></span><span></span><span></span><span></span>
+  </div>
+  <span class="music-label" id="musicLabel">Now Playing</span>
+</div>
+
+<script>
+  const audio = document.getElementById('bgMusic');
+  const bars = document.getElementById('musicBars');
+  const label = document.getElementById('musicLabel');
+  let playing = false;
+
+  function startMusic() {
+    audio.volume = 0.4;
+    audio.play().then(() => {
+      playing = true;
+      bars.classList.remove('paused');
+      label.textContent = 'Now Playing';
+    }).catch(() => {});
+  }
+
+  document.addEventListener('click', function handler() {
+    if (!playing) startMusic();
+    document.removeEventListener('click', handler);
+  }, { once: true });
+
+  document.getElementById('musicToggle').addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (playing) {
+      audio.pause(); playing = false;
+      bars.classList.add('paused');
+      label.textContent = 'Music Off';
+    } else { startMusic(); }
+  });
+</script>
 
 </body>
 </html>
